@@ -24,6 +24,9 @@ app.get('/nosotros', function(req, res){
 
 //app.get('/', usuarioRoutes)
 
+// Carpeta Pública
+app.use( express.static('public'))
+
 // Routing
 app.use('/auth', usuarioRoutes)
 
