@@ -2,7 +2,9 @@
 
 import express from "express";
 import usuarioRoutes from './routes/usuarioRoutes.js'
+import db from './config(db.js'
 
+// Crear la app
 const app = express();
 
 // Habilitar Pug
