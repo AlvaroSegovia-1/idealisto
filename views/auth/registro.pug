@@ -1,31 +1,36 @@
 extends ../layout/index
 
 block contenido 
-    div.py-10
-        h1.text-5xl.my-10.font-extrabold.text-center Idea
+    div.py-6
+        h1.text-5xl.my-6.font-extrabold.text-center Idea
             span.font-normal Listo
         h2.text-center.text-2xl.font-extrabold= pagina
 
+        if errores 
+            div(class="max-w-md mx-auto my-10")
+                each error in errores
+                    div.flex.justify-center
+                        p.w-80.bg-red-600.text-white.uppercase.text-xs.text-center.p-2.mb-2.font-bold= error.msg
+
         .mt-8.mx-auto.max-w-md 
             div(class="rounded-[10px] bg-white py-8 px-6 drop-shadow-xl")  
-                form.space-y-5(method="POST" action="/auth/registro")
+                form.space-y-5(method="POST" action="/auth/registro" noValidate)
                     div 
                         label.block.text-sm.uppercase.text-gray-600.mb-2.font-bold(for="nombre") nombre
-                        input#nombre.w-full.px-3.py-2.border.border-gray-400.rounded-md.placeholder-gray-400(placeholder="Tu Nombre" type="text" name="nombre")
+                        input#nombre.w-full.px-3.py-2.border.border-gray-400.rounded-md.placeholder-gray-400(placeholder="Tu Nombre" type="text" name="nombre" value= usuario ? usuario.nombre: '')
                     div
                         label.block.text-sm.uppercase.text-gray-600.mb-2.font-bold(for="email") Email de registro
-                        input#email.w-full.px-3.py-2.border.border-gray-400.rounded-md.placeholder-gray-400(placeholder="Tu Email" type="email" name="email")
+                        input#email.w-full.px-3.py-2.border.border-gray-400.rounded-md.placeholder-gray-400(placeholder="Tu Email" type="email" name="email" value= usuario ? usuario.email: '')
                     div
                         label.block.text-sm.uppercase.text-gray-600.mb-2.font-bold(for="password") Password
                         input#password.w-full.px-3.py-2.border.border-gray-400.rounded-md.placeholder-gray-400(placeholder="Password" type="password" name="password")
-                    div
-                        label.block.text-sm.uppercase.text-gray-600.mb-2.font-bold(for="repetir_password") Repetir Password
-                        input#repetir_password.w-full.px-3.py-2.border.border-gray-400.rounded-md.placeholder-gray-400(placeholder="Password" type="password" name="repetir_password")
-                    div.flex.items-center.justify-between.mx-4
-                        
-                    div.flex.justify-center
-                        
+                    //div
+                    //    label.block.text-sm.uppercase.text-gray-600.mb-2.font-bold(for="repetir_password") Repetir Password
+                    //    input#repetir_password.w-full.px-3.py-2.border.border-gray-400.rounded-md.placeholder-gray-400(placeholder="Password" type="password" name="repetir_password")
+                                           
+                    div.flex.justify-center                        
                         input(class="w-80 bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 rounded-md cursor-pointer" type="submit" value="Crear Cuenta")
+
                     div.flex.justify-center.pt-4
                         a.text-gray-500.text-xs.bg-orange-200.p-2.rounded-md(href="/auth/login") Iniciar Sesión 
                         //a.text-gray-500.text-xs.bg-orange-200.p-2(href="/auth/olvide-password") Olvide mi password 
