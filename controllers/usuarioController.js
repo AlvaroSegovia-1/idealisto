@@ -1,5 +1,7 @@
 import { check, validationResult } from "express-validator";
 import Usuario from "../models/Usuario.js";
+import { generarId } from "../helpers/tokens.js";
+import { emailRegistro } from "../helpers/emails.js";
 
 const formularioLogin = (req, res) => {
   res.render("auth/login", {
@@ -24,7 +26,7 @@ const registrar = async (req, res) => {
 
   await check("email")
     .isEmail()
-    .withMessage("Introduce un mail válido")
+    .withMessage("Introduce un email válido")
     .run(req);
 
   await check("password")
@@ -32,12 +34,14 @@ const registrar = async (req, res) => {
     .withMessage("Password minimo de 6 caracteres")
     .run(req);
 
-  /*  await check("repetir_password")
+  /* await check("repetir_password")
     .equals("password")
     .withMessage("El password no coincide")
-    .run(req);
- */
+    .run(req); */
+
   let resultado = validationResult(req);
+  // return res.json(resultado.array())
+
   // Verificar que el resultado este vacio
   if (!resultado.isEmpty()) {
     //Errores
@@ -54,7 +58,6 @@ const registrar = async (req, res) => {
   const { nombre, email, password } = req.body;
 
   // Verificar que el usuario no este duplicado
-
   const existeUsuario = await Usuario.findOne({
     where: { email },
   });
@@ -73,15 +76,56 @@ const registrar = async (req, res) => {
 
   //return;
   //res.json(resultado.array());
+
   // Almacenar un usuario
-  //const usuario = 
-  await Usuario.create({
+  const usuario = await Usuario.create({
     nombre,
     email,
     password,
-    token: 123,
+    token: generarId(),
   });
-  // res.json(usuario);
+
+  // Envia email de confirmación
+  emailRegistro({
+    nombre: usuario.nombre,
+    email: usuario.email,
+    token: usuario.token,
+  });
+
+  // Mostrar mensaje de confirmación
+  res.render("templates/mensaje", {
+    pagina: "Cuenta Creada correctamente",
+    mensaje: "Hemos enviado un email de confirmación, presiona en el enlace",
+  });
+};
+
+// Función que comprueba una cuenta
+const confirmar = async (req, res) => {
+  const { token } = req.params;
+
+  console.log(token);
+
+  // Verificar si el token es válido
+  const usuario = await Usuario.findOne({ where: { token } });
+  //console.log(usuario)
+
+  if (!usuario) {
+    return res.render("auth/confirmar-cuenta", {
+      pagina: "Error al confirmar tu cuenta",
+      mensaje: "Hubo un error al confirmar tu cuenta, intenta de nuevo",
+      error: true,
+    });
+  }
+  // Confirmar la cuenta
+  usuario.token = null;
+  usuario.confirmado = true;
+  await usuario.save();
+  //console.log(usuario);
+
+  res.render("auth/confirmar-cuenta", {
+    pagina: "Cuenta confirmada",
+    mensaje: "La cuenta se confirmó correctamente",
+  });
 };
 
 const formularioOlvidePassword = (req, res) => {
@@ -94,5 +138,6 @@ export {
   formularioLogin,
   formularioRegistro,
   registrar,
+  confirmar,
   formularioOlvidePassword,
 };
